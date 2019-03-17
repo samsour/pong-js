@@ -1,0 +1,151 @@
+* { 
+	padding: 0; margin: 0; 
+}
+
+body{
+	background: #2a3843;
+	font-family: Arial, sans-serif;
+	color: #111;
+	-webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0.1em;
+    font-size: 18px;
+}
+
+body ::selection {
+    background: transparent;
+    color: inherit;
+}
+body ::-moz-selection {
+    background: transparent;
+    color: inherit;
+}
+
+.stats-container{
+	display:flex;
+	background: #111;
+	height: 70px;
+	width: 100%;
+	z-index: 100;
+	margin-bottom: 100px;
+	overflow: hidden;
+
+}
+.stat{
+	flex:1;
+	text-align: center;
+	color: #80a2bc;
+	line-height: 70px;
+	letter-spacing: 0.1em;
+	overflow:hidden;
+}
+
+
+.main {
+	width: 100%;
+	margin: 0 auto;
+	display: flex;
+}
+
+.flex-item {
+	flex:1;
+}
+
+canvas { 
+	z-index: 1;
+	background: #fff;
+	/*left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);*/
+	display: block; 
+	box-shadow: 0 0 10px #000;
+	cursor: crosshair;
+	margin: 0 auto;
+}
+
+a{
+	color: #000;
+	text-decoration: none;
+}
+
+a:hover{
+	color: #ddd;
+}
+
+.button{
+	width: 80px;
+	height: 40px;
+	background-color: #eee;
+	border: none;
+	outline: 0;
+	box-shadow: 0 0 4px #000;
+	cursor: pointer;
+}
+
+.login-area{
+	width: 100%;
+	text-align: center;
+}
+
+.login-area input{
+	background: #2a3843;
+	border: 1px solid #80a2bc;
+	line-height: 40px;
+	/*color: #80a2bc;*/
+	color: #111;
+	outline: none;
+	width: 200px;
+	margin: 10px;
+	text-align: center;
+	font-size: 18px;
+}
+.login-area input:hover{
+	background: #3d5160;	
+}
+
+.submit-btn{
+	color: lightgreen;
+}
+
+.highscores{
+	margin-top: 100px;
+	text-align: center;
+	font-size: 18px;
+	max-width: 460px;
+	margin: 0 auto;
+}
+
+.hs-left{
+	width:50%;
+	float:left;
+}
+
+.hs-right{
+	width:50%;
+	float:right;
+}
+
+.hs-entry{
+	margin:50px;
+	line-height: 50px;
+	border-bottom: 1px solid #80a2bc;
+}
+
+h3, h4{
+	text-decoration: none;
+	font-weight: normal;
+	color: #80a2bc;
+	margin: 30px;
+}
+
+.textfield{
+	display: none;
+}
+
+.red{
+	color: red;
+}
+
+.green{
+	color: lightgreen;
+}
