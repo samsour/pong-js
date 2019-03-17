@@ -2,10 +2,12 @@ var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 
 var ball = {
+	x: canvas.width / 2,
+	y: canvas.height - 30,
 	speed: getRandomArbitrary(-4, 5),
 	isMovingUp: false,
-	x: canvas.width / 2,
-	y: canvas.height - 30
+	color: "#0095DD",
+	radius: 10
 }
 
 var player = {
@@ -14,9 +16,6 @@ var player = {
 
 var dx = ball.speed * getRandomArbitrary(-2, 3);
 var dy = ball.speed * getRandomArbitrary(-2, 3);
-
-var ballRadius = 10;
-var ballColor = "#0095DD"
 
 var paddleHeight = 10;
 var paddleWidth = 75;
@@ -72,8 +71,8 @@ function togglePause() {
 
 function drawBall() {
 	ctx.beginPath();
-	ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
-	ctx.fillStyle = ballColor;
+	ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+	ctx.fillStyle = ball.color;
 	ctx.fill();
 	ctx.closePath();
 }
@@ -115,7 +114,7 @@ function draw() {
 	drawEnemy();
 
 	//Win case
-	if (ball.y + dy < ballRadius + paddleHeight) {
+	if (ball.y + dy < ball.radius + paddleHeight) {
 		if (ball.x > enemyX && ball.x < enemyX + paddleWidth) {
 			dy = -dy;
 			ball.isMovingUp = false;
@@ -123,20 +122,20 @@ function draw() {
 			win = true;
 		}
 		//Lose case
-	} else if (ball.y + dy > canvas.height - ballRadius - paddleHeight) {
+	} else if (ball.y + dy > canvas.height - ball.radius - paddleHeight) {
 		if (ball.x > paddleX && ball.x < paddleX + paddleWidth) {
 			dy = -dy;
 			ball.isMovingUp = true;
 			dx++;
 			dy--;
 		}
-		else if (ball.y + dy > canvas.height - ballRadius) {
+		else if (ball.y + dy > canvas.height - ball.radius) {
 			lose = true;
 		}
 	}
 
 
-	if (ball.x + dx > canvas.width - ballRadius || ball.x + dx < ballRadius) {
+	if (ball.x + dx > canvas.width - ball.radius || ball.x + dx < ball.radius) {
 		dx = -dx;
 		ballSpeed = getRandomArbitrary(-4, 5);
 	}
