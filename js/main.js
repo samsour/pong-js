@@ -1,178 +1,188 @@
-var canvas = document.getElementById("myCanvas");
-var ctx = canvas.getContext("2d");
+var animate = window.requestAnimationFrame ||
+  window.webkitRequestAnimationFrame ||
+  window.mozRequestAnimationFrame ||
+  function(callback) { window.setTimeout(callback, 1000/60) };
 
-var ball = {
-	x: canvas.width / 2,
-	y: canvas.height - 30,
-	speed: getRandomArbitrary(-4, 5),
-	isMovingUp: false,
-	color: "#0095DD",
-	radius: 10
+var canvas = document.createElement('canvas');
+var width = 400;
+var height = 600;
+canvas.width = width;
+canvas.height = height;
+var context = canvas.getContext('2d');
+
+window.onload = function() {
+  document.body.appendChild(canvas);
+  animate(step);
+};
+
+var step = function() {
+  update();
+  render();
+  animate(step);
+};
+
+var update = function() {
+	player.update();
+	ball.update(player.paddle, computer.paddle);
+	computer.update(ball);
+};
+
+var render = function() {
+  context.fillStyle = "#000";
+  context.fillRect(0, 0, width, height);
+};
+
+function Paddle(x, y, width, height) {
+  this.x = x;
+  this.y = y;
+  this.width = width;
+  this.height = height;
+  this.x_speed = 0;
+  this.y_speed = 0;
 }
 
-var player = {
-	speed: 5
+Paddle.prototype.move = function(x, y) {
+  this.x += x;
+  this.y += y;
+  this.x_speed = x;
+  this.y_speed = y;
+  if(this.x < 0) { // all the way to the left
+    this.x = 0;
+    this.x_speed = 0;
+  } else if (this.x + this.width > 400) { // all the way to the right
+    this.x = 400 - this.width;
+    this.x_speed = 0;
+  }
 }
 
-var dx = ball.speed * getRandomArbitrary(-2, 3);
-var dy = ball.speed * getRandomArbitrary(-2, 3);
+Paddle.prototype.render = function() {
+  context.fillStyle = "#fff";
+  context.fillRect(this.x, this.y, this.width, this.height);
+};
 
-var paddleHeight = 10;
-var paddleWidth = 75;
-var paddleX = (canvas.width - paddleWidth) / 2;
-var enemyX = (canvas.width - paddleWidth) / 2;
-
-var rightPressed = false;
-var leftPressed = false;
-
-var paused = false;
-var lose = false;
-var win = false;
-
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
-
-function keyDownHandler(e) {
-	if (e.keyCode == 39) {
-		rightPressed = true;
-	}
-	else if (e.keyCode == 37) {
-		leftPressed = true;
-	}
+function Player() {
+   this.paddle = new Paddle(175, 580, 50, 10);
 }
 
-function keyUpHandler(e) {
-	if (e.keyCode == 39) {
-		rightPressed = false;
-	}
-	else if (e.keyCode == 37) {
-		leftPressed = false;
-	}
-	else if (e.keyCode == 80) {
-		togglePause();
-	}
-	else if (e.keyCode == 32 || e.keyCode == 13) {
-		document.location.reload();
-	}
+Player.prototype.render = function() {
+  this.paddle.render();
+};
+
+Player.prototype.update = function() {
+  for(var key in keysDown) {
+    var value = Number(key);
+    if(value == 37) { // left arrow
+      this.paddle.move(-4, 0);
+    } else if (value == 39) { // right arrow
+      this.paddle.move(4, 0);
+    } else {
+      this.paddle.move(0, 0);
+    }
+  }
+};
+
+function Computer() {
+  this.paddle = new Paddle(175, 10, 50, 10);
 }
 
-function getRandomArbitrary(min, max) {
-	return Math.random() * (max - min) + min;
+Computer.prototype.render = function() {
+  this.paddle.render();
+};
+
+Computer.prototype.update = function(ball) {
+  var x_pos = ball.x;
+  var diff = -((this.paddle.x + (this.paddle.width / 2)) - x_pos);
+  if(diff < 0 && diff < -4) { // max speed left
+    diff = -5;
+  } else if(diff > 0 && diff > 4) { // max speed right
+    diff = 5;
+  }
+  this.paddle.move(diff, 0);
+  if(this.paddle.x < 0) {
+    this.paddle.x = 0;
+  } else if (this.paddle.x + this.paddle.width > 400) {
+    this.paddle.x = 400 - this.paddle.width;
+  }
+};
+
+function Ball(x, y) {
+  this.x = x;
+  this.y = y;
+  this.x_speed = 0;
+  this.y_speed = 3;
+  this.radius = 5;
 }
 
-function togglePause() {
-	if (!paused) {
-		paused = true;
-	} else if (paused) {
-		paused = false;
-		window.requestAnimationFrame(draw);
-	}
-}
+Ball.prototype.render = function() {
+  context.beginPath();
+  context.arc(this.x, this.y, this.radius, 2 * Math.PI, false);
+  context.fillStyle = "#fff";
+  context.fill();
+};
 
-function drawBall() {
-	ctx.beginPath();
-	ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-	ctx.fillStyle = ball.color;
-	ctx.fill();
-	ctx.closePath();
-}
+Ball.prototype.update = function() {
+  this.x += this.x_speed;
+  this.y += this.y_speed;
+};
 
-function drawPaddle() {
-	ctx.beginPath();
-	ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-	ctx.fillStyle = "#666";
-	ctx.fill();
-	ctx.closePath();
-}
+Ball.prototype.update = function(paddle1, paddle2) {
+  this.x += this.x_speed;
+  this.y += this.y_speed;
+  var top_x = this.x - 5;
+  var top_y = this.y - 5;
+  var bottom_x = this.x + 5;
+  var bottom_y = this.y + 5;
 
-function drawEnemy() {
-	ctx.beginPath();
-	ctx.rect(enemyX, 0, paddleWidth, paddleHeight);
-	ctx.fillStyle = "#666";
-	ctx.fill();
-	ctx.closePath();
-}
+  if(this.x - 5 < 0) { // hitting the left wall
+    this.x = 5;
+    this.x_speed = -this.x_speed;
+  } else if(this.x + 5 > 400) { // hitting the right wall
+    this.x = 395;
+    this.x_speed = -this.x_speed;
+  }
 
-function drawPause() {
-	ctx.font = "30px Arial";
-	ctx.fillStyle = "#666";
-	ctx.textAlign = "center";
-	ctx.fillText("Pause", canvas.width / 2, canvas.height / 2);
-}
+  if(this.y < 0 || this.y > 600) { // a point was scored
+    this.x_speed = 0;
+    this.y_speed = 3;
+    this.x = 200;
+    this.y = 300;
+  }
 
-function drawText(text) {
-	ctx.font = "30px Arial";
-	ctx.fillStyle = "#666";
-	ctx.textAlign = "center";
-	ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-}
+  if(top_y > 300) {
+    if(top_y < (paddle1.y + paddle1.height) && bottom_y > paddle1.y && top_x < (paddle1.x + paddle1.width) && bottom_x > paddle1.x) {
+      // hit the player's paddle
+      this.y_speed = -3;
+      this.x_speed += (paddle1.x_speed / 2);
+      this.y += this.y_speed;
+    }
+  } else {
+    if(top_y < (paddle2.y + paddle2.height) && bottom_y > paddle2.y && top_x < (paddle2.x + paddle2.width) && bottom_x > paddle2.x) {
+      // hit the computer's paddle
+      this.y_speed = 3;
+      this.x_speed += (paddle2.x_speed / 2);
+      this.y += this.y_speed;
+    }
+  }
+};
 
-function draw() {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	drawBall();
-	drawPaddle();
-	drawEnemy();
+var keysDown = {};
 
-	//Win case
-	if (ball.y + dy < ball.radius + paddleHeight) {
-		if (ball.x > enemyX && ball.x < enemyX + paddleWidth) {
-			dy = -dy;
-			ball.isMovingUp = false;
-		} else if (ball.y + dy < paddleHeight) {
-			win = true;
-		}
-		//Lose case
-	} else if (ball.y + dy > canvas.height - ball.radius - paddleHeight) {
-		if (ball.x > paddleX && ball.x < paddleX + paddleWidth) {
-			dy = -dy;
-			ball.isMovingUp = true;
-			dx++;
-			dy--;
-		}
-		else if (ball.y + dy > canvas.height - ball.radius) {
-			lose = true;
-		}
-	}
+window.addEventListener("keydown", function(event) {
+  keysDown[event.keyCode] = true;
+});
 
+window.addEventListener("keyup", function(event) {
+  delete keysDown[event.keyCode];
+});
 
-	if (ball.x + dx > canvas.width - ball.radius || ball.x + dx < ball.radius) {
-		dx = -dx;
-		ballSpeed = getRandomArbitrary(-4, 5);
-	}
+var player = new Player();
+var computer = new Computer();
+var ball = new Ball(200, 300);
 
-	//Paddle Movement
-
-	if (rightPressed && paddleX < canvas.width - paddleWidth) {
-		paddleX += player.speed;
-	}
-	else if (leftPressed && paddleX > 0) {
-		paddleX -= player.speed;
-	}
-
-	//Enemy Movement
-	if (ball.y < canvas.height * 0.8 && ball.isMovingUp) {
-		if (enemyX + paddleWidth / 2 < ball.x && enemyX < canvas.width - paddleWidth) {
-			enemyX += player.speed;
-		}
-		else if (enemyX + paddleWidth / 2 > ball.x && enemyX > 0) {
-			enemyX -= player.speed;
-		}
-	}
-
-	ball.x += dx;
-	ball.y += dy;
-
-	if (!paused) {
-
-		if (lose) {
-			drawText("You Lose!");
-		} else if (win) {
-			drawText("You win!");
-		} else {
-			window.requestAnimationFrame(draw);
-		}
-	} else {
-		drawPause();
-	}
-}
-window.requestAnimationFrame(draw);
+var render = function() {
+  context.fillStyle = "#000";
+  context.fillRect(0, 0, width, height);
+  player.render();
+  computer.render();
+  ball.render();
+};
