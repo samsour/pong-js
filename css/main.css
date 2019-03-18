@@ -3,7 +3,7 @@
 }
 
 body{
-	background: #2a3843;
+	background: #fff;
 }
 
 body ::selection {
@@ -20,5 +20,6 @@ canvas {
 	background: #fff;
 	display: block; 
 	box-shadow: 0 0 10px #000;
-	margin: 0 auto;
+	margin: auto;
+	transform: rotate(90deg);
 }

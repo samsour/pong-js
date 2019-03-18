@@ -71,9 +71,9 @@ Player.prototype.render = function () {
 Player.prototype.update = function () {
   for (var key in keysDown) {
     var value = Number(key);
-    if (value == 37) { // left arrow
+    if (value == 38) { // up arrow
       this.paddle.move(-4, 0);
-    } else if (value == 39) { // right arrow
+    } else if (value == 40) { // down arrow
       this.paddle.move(4, 0);
     } else {
       this.paddle.move(0, 0);
