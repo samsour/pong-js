@@ -1,14 +1,17 @@
-var animate = window.requestAnimationFrame ||
+var animate =
+  window.requestAnimationFrame ||
   window.webkitRequestAnimationFrame ||
   window.mozRequestAnimationFrame ||
-  function (callback) { window.setTimeout(callback, 1000 / 60) };
+  function (callback) {
+    window.setTimeout(callback, 1000 / 60);
+  };
 
-var canvas = document.createElement('canvas');
+var canvas = document.createElement("canvas");
 var width = 400;
 var height = 600;
 canvas.width = width;
 canvas.height = height;
-var context = canvas.getContext('2d');
+var context = canvas.getContext("2d");
 
 window.onload = function () {
   document.body.appendChild(canvas);
@@ -46,14 +49,16 @@ Paddle.prototype.move = function (x, y) {
   this.y += y;
   this.xSpeed = x;
   this.ySpeed = y;
-  if (this.x < 0) { // all the way to the left
+  if (this.x < 0) {
+    // all the way to the left
     this.x = 0;
     this.xSpeed = 0;
-  } else if (this.x + this.width > 400) { // all the way to the right
+  } else if (this.x + this.width > 400) {
+    // all the way to the right
     this.x = 400 - this.width;
     this.xSpeed = 0;
   }
-}
+};
 
 Paddle.prototype.render = function () {
   context.fillStyle = "#fff";
@@ -71,9 +76,11 @@ Player.prototype.render = function () {
 Player.prototype.update = function () {
   for (var key in keysDown) {
     var value = Number(key);
-    if (value == 38) { // up arrow
+    if (value == 37) {
+      // up arrow
       this.paddle.move(-4, 0);
-    } else if (value == 40) { // down arrow
+    } else if (value == 39) {
+      // down arrow
       this.paddle.move(4, 0);
     } else {
       this.paddle.move(0, 0);
@@ -91,10 +98,12 @@ Computer.prototype.render = function () {
 
 Computer.prototype.update = function (ball) {
   var xPos = ball.x;
-  var diff = -((this.paddle.x + (this.paddle.width / 2)) - xPos);
-  if (diff < 0 && diff < -4) { // max speed left
+  var diff = -(this.paddle.x + this.paddle.width / 2 - xPos);
+  if (diff < 0 && diff < -4) {
+    // max speed left
     diff = -5;
-  } else if (diff > 0 && diff > 4) { // max speed right
+  } else if (diff > 0 && diff > 4) {
+    // max speed right
     diff = 5;
   }
   this.paddle.move(diff, 0);
@@ -133,15 +142,29 @@ Ball.prototype.update = function (paddle1, paddle2) {
   var bottomX = this.x + this.radius;
   var bottomY = this.y + this.radius;
 
-  if (this.x - 5 < 0) { // hitting the left wall
+  if (this.x - 5 < 0) {
+    // hitting the top wall
     this.x = 5;
     this.xSpeed = -this.xSpeed;
-  } else if (this.x + 5 > 400) { // hitting the right wall
+  } else if (this.x + 5 > 400) {
+    // hitting the bottom wall
     this.x = 395;
     this.xSpeed = -this.xSpeed;
   }
 
-  if (this.y < 0 || this.y > 600) { // a point was scored
+  if (this.y < 0 || this.y > 600) {
+    // a point was scored
+    var scoreElement = null;
+    if (this.y <= 0) {
+      scoreElement = document.getElementById("userScore");
+    }
+    if (this.y >= 600) {
+      scoreElement = document.getElementById("enemyScore");
+    }
+    // Score
+    var currentScore = parseInt(scoreElement.innerHTML);
+    scoreElement.innerHTML = currentScore + 1;
+
     this.xSpeed = 0;
     this.ySpeed = 3;
     this.x = 200;
@@ -149,17 +172,27 @@ Ball.prototype.update = function (paddle1, paddle2) {
   }
 
   if (topY > 300) {
-    if (topY < (paddle1.y + paddle1.height) && bottomY > paddle1.y && topX < (paddle1.x + paddle1.width) && bottomX > paddle1.x) {
+    if (
+      topY < paddle1.y + paddle1.height &&
+      bottomY > paddle1.y &&
+      topX < paddle1.x + paddle1.width &&
+      bottomX > paddle1.x
+    ) {
       // hit the player's paddle
       this.ySpeed = -3;
-      this.xSpeed += (paddle1.xSpeed / 2);
+      this.xSpeed += paddle1.xSpeed / 2;
       this.y += this.ySpeed;
     }
   } else {
-    if (topY < (paddle2.y + paddle2.height) && bottomY > paddle2.y && topX < (paddle2.x + paddle2.width) && bottomX > paddle2.x) {
+    if (
+      topY < paddle2.y + paddle2.height &&
+      bottomY > paddle2.y &&
+      topX < paddle2.x + paddle2.width &&
+      bottomX > paddle2.x
+    ) {
       // hit the computer's paddle
       this.ySpeed = 3;
-      this.xSpeed += (paddle2.xSpeed / 2);
+      this.xSpeed += paddle2.xSpeed / 2;
       this.y += this.ySpeed;
     }
   }

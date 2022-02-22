@@ -1,25 +1,51 @@
-* { 
-	padding: 0; margin: 0; 
+* {
+  padding: 0;
+  margin: 0;
 }
 
-body{
-	background: #fff;
+body {
+  background: #fff;
 }
 
 body ::selection {
-    background: transparent;
-    color: inherit;
+  background: transparent;
+  color: inherit;
 }
 body ::-moz-selection {
-    background: transparent;
-    color: inherit;
+  background: transparent;
+  color: inherit;
 }
 
-canvas { 
-	z-index: 1;
-	background: #fff;
-	display: block; 
-	box-shadow: 0 0 10px #000;
-	margin: auto;
-	transform: rotate(90deg);
+canvas {
+  z-index: 1;
+  background: #fff;
+  display: block;
+  box-shadow: 0 0 10px #000;
+  margin: auto;
+}
+
+.scoreboard {
+  display: flex;
+  max-width: 320px;
+  margin: 0 auto;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.scoreboard__score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+h4 {
+  margin-bottom: 20px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  text-align: center;
 }
